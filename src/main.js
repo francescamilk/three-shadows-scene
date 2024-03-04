@@ -1,6 +1,6 @@
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import GUI from 'lil-gui'
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import GUI from 'lil-gui';
 
 // Debugger init
 const gui = new GUI();
@@ -15,20 +15,27 @@ const scene = new THREE.Scene();
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 1);
+scene.add(hemisphereLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
 directionalLight.position.set(2, 2, -1);
 scene.add(directionalLight);
-
 
 // &plug debugger
 gui
     .add(ambientLight, 'intensity')
-    .min(0).max(3).step(0.001)
+    .min(0).max(4).step(0.001)
     .name('ambient light intensity');
 
 gui
+    .add(hemisphereLight, 'intensity')
+    .min(0).max(4).step(0.001)
+    .name('hemisphere light intensity');
+
+gui
     .add(directionalLight, 'intensity')
-    .min(0).max(3).step(0.001)    
+    .min(0).max(4).step(0.001)    
     .name('directional lights intensity');
 
 gui
@@ -48,7 +55,8 @@ gui
 
 // Materials
 const material = new THREE.MeshStandardMaterial();
-material.roughness = 0.7;
+material.roughness = 0.4;
+material.metalness = 0.2;
 
 // &plug debugger
 gui
@@ -76,14 +84,21 @@ plane.position.y = -0.5;
 
 scene.add(sphere, plane);
 
+// Shadows
+sphere.castShadow   = true;
+plane.receiveShadow = true;
+
+directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.width  = 1024;
+directionalLight.shadow.mapSize.height = 1024;
+
 // Window
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
-}
+};
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
     // update sizes
     sizes.width  = window.innerWidth;
     sizes.height = window.innerHeight;
@@ -95,12 +110,9 @@ window.addEventListener('resize', () =>
     // update renderer
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-})
+});
 
-/**
- * Camera
- */
-// Base camera
+// Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
 camera.position.set(1, 1, 2);
 scene.add(camera);
@@ -109,17 +121,19 @@ scene.add(camera);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 
-// Rendere
+// Renderer
 const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// activate shadow maps
+renderer.shadowMap.enabled = true;
 
 // Animate
 // const clock    = new THREE.Clock();
 const animLoop = () =>
 {
     // const elapsedTime = clock.getElapsedTime();
-
     // enable damping
     controls.update();
 
