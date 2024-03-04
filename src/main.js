@@ -87,10 +87,28 @@ scene.add(sphere, plane);
 // Shadows
 sphere.castShadow   = true;
 plane.receiveShadow = true;
-
 directionalLight.castShadow = true;
+
+// set resolution of shadow map
 directionalLight.shadow.mapSize.width  = 1024;
 directionalLight.shadow.mapSize.height = 1024;
+
+// define shadow camera distance range
+directionalLight.shadow.camera.near = 1;
+directionalLight.shadow.camera.far  = 6;
+
+// define shadow camera amplitude area
+directionalLight.shadow.camera.top    = 2;
+directionalLight.shadow.camera.right  = 2;
+directionalLight.shadow.camera.bottom = -2;
+directionalLight.shadow.camera.left   = -2;
+
+// control shadow blur
+directionalLight.shadow.radius = 10;
+
+// &helper
+const directionalLightCamHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
+scene.add(directionalLightCamHelper);
 
 // Window
 const sizes = {
