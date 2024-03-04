@@ -19,11 +19,11 @@ const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 1.2);
 scene.add(hemisphereLight);
 
 const spotLight = new THREE.SpotLight(0xffffff, 3.6, 10, Math.PI * 0.3);
-spotLight.position.set(0, 2, 2);
+spotLight.position.set(-0.8, 2, -0.4);
 scene.add(spotLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
-directionalLight.position.set(2, 2, -1);
+directionalLight.position.set(2, 1.3, -1);
 scene.add(directionalLight);
 
 // &plug debugger
@@ -61,6 +61,22 @@ gui
     .add(directionalLight.position, 'z')
     .min(- 5).max(5).step(0.001)
     .name('directional lights z');
+
+gui
+    .add(spotLight.position, 'x')
+    .min(- 5).max(5).step(0.001)
+    .name('spot lights x');
+
+gui
+    .add(spotLight.position, 'y')
+    .min(- 5).max(5).step(0.001)
+    .name('spot lights y');
+
+gui
+    .add(spotLight.position, 'z')
+    .min(- 5).max(5).step(0.001)
+    .name('spot lights z');
+
 
 // Materials
 const material = new THREE.MeshStandardMaterial();
@@ -148,7 +164,7 @@ window.addEventListener('resize', () => {
 
 // Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
-camera.position.set(1, 0.9, 4);
+camera.position.set(1, 0.9, 3.6);
 scene.add(camera);
 
 // Controls
