@@ -12,13 +12,17 @@ const canvas = document.querySelector('canvas#webgl');
 const scene = new THREE.Scene();
 
 // Lights
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
 
-const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 1);
+const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 1.2);
 scene.add(hemisphereLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+const spotLight = new THREE.SpotLight(0xffffff, 3.6, 10, Math.PI * 0.3);
+spotLight.position.set(0, 2, 2);
+scene.add(spotLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
 directionalLight.position.set(2, 2, -1);
 scene.add(directionalLight);
 
@@ -32,6 +36,11 @@ gui
     .add(hemisphereLight, 'intensity')
     .min(0).max(4).step(0.001)
     .name('hemisphere light intensity');
+
+gui
+    .add(spotLight, 'intensity')
+    .min(0).max(4).step(0.001)
+    .name('spot light intensity');
 
 gui
     .add(directionalLight, 'intensity')
@@ -88,14 +97,21 @@ scene.add(sphere, plane);
 sphere.castShadow   = true;
 plane.receiveShadow = true;
 directionalLight.castShadow = true;
+spotLight.castShadow        = true;
 
 // set resolution of shadow map
-directionalLight.shadow.mapSize.width  = 1024;
-directionalLight.shadow.mapSize.height = 1024;
+directionalLight.shadow.mapSize.width  = 1024 / 6;
+directionalLight.shadow.mapSize.height = 1024 / 6;
+
+spotLight.shadow.mapSize.width  = 1024;
+spotLight.shadow.mapSize.height = 1024;
 
 // define shadow camera distance range
 directionalLight.shadow.camera.near = 1;
 directionalLight.shadow.camera.far  = 6;
+
+spotLight.shadow.camera.near = 1;
+spotLight.shadow.camera.far  = 6;
 
 // define shadow camera amplitude area
 directionalLight.shadow.camera.top    = 2;
@@ -103,12 +119,12 @@ directionalLight.shadow.camera.right  = 2;
 directionalLight.shadow.camera.bottom = -2;
 directionalLight.shadow.camera.left   = -2;
 
-// control shadow blur
-directionalLight.shadow.radius = 10;
-
 // &helper
 const directionalLightCamHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
 scene.add(directionalLightCamHelper);
+
+const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera);
+scene.add(spotLightCameraHelper);
 
 // Window
 const sizes = {
@@ -132,7 +148,7 @@ window.addEventListener('resize', () => {
 
 // Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
-camera.position.set(1, 1, 2);
+camera.position.set(1, 0.9, 4);
 scene.add(camera);
 
 // Controls
@@ -146,6 +162,9 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // activate shadow maps
 renderer.shadowMap.enabled = true;
+
+// shadow map algorithm          (smoother edges)
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // Animate
 // const clock    = new THREE.Clock();
