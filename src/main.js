@@ -164,7 +164,7 @@ window.addEventListener('resize', () => {
 
 // Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
-camera.position.set(1, 0.9, 3.6);
+camera.position.set(1, 0.9, 2.8);
 scene.add(camera);
 
 // Controls
@@ -183,10 +183,16 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // Animate
-// const clock    = new THREE.Clock();
+const clock    = new THREE.Clock();
 const animLoop = () =>
 {
-    // const elapsedTime = clock.getElapsedTime();
+    const elapsedTime = clock.getElapsedTime()
+
+    // animate the sphere
+    sphere.position.x = Math.cos(elapsedTime) * 1.5;
+    sphere.position.z = Math.sin(elapsedTime) * 1.5;
+    sphere.position.y = Math.abs(Math.sin(elapsedTime * 3));
+
     // enable damping
     controls.update();
 
